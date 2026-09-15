@@ -6,8 +6,8 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket       = "bjarte-tfstate-790873128115-eu-north-1"
+    backend "s3" {
+    bucket       = "golf-stats-tfstate-790873128115-eu-north-1"
     key          = "golf-stats/terraform.tfstate"
     region       = "eu-north-1"
     use_lockfile = true
