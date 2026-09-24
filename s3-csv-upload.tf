@@ -6,7 +6,7 @@ data "aws_kms_key" "golf_key" {
 }
 
 resource "aws_s3_bucket" "csv_uploads" {
-  bucket           = format("golf-stats-csv-uploads-%s-%s", data.aws_caller_identity.current.account_id, data.aws_region.current.region)
+  bucket           = format("golf-stats-csv-uploads-%s-%s-an", data.aws_caller_identity.current.account_id, data.aws_region.current.region)
   bucket_namespace = "account-regional"
 }
 
