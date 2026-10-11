@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+EXPECTED_HOLES = {"ALL": 18, "FRONT_9": 9, "BACK_9": 9}
+
 
 @dataclass
 class ParseResult:
@@ -10,15 +12,21 @@ class ParseResult:
 def parse_summary(payload):
     result = ParseResult()
     for rnd in payload["scorecardSummaries"]:
+        if rnd.get("id") is None:
+            result.discarded.append({"id": None, "reason": "missing_id"})
+            continue
         if rnd["roundInProgress"]:
             result.discarded.append({"id": rnd["id"], "reason": "round_in_progress"})
+            continue
+        if rnd["roundType"] not in EXPECTED_HOLES:
+            result.discarded.append({"id": rnd["id"], "reason": "unknown_round_type"})
             continue
         strokes = [h["strokes"] for h in rnd["holes"]]
         pars = [int(p) for p in rnd["holePars"]]
         played = [(s, p) for s, p in zip(strokes, pars) if s is not None]
-        if len(played) != 18:
+        if len(played) != EXPECTED_HOLES[rnd["roundType"]]:
             result.discarded.append({"id": rnd["id"], "reason": "incomplete_round"})
-            continue
+            continue    
         total_strokes = sum(s for s, _ in played)
         total_par = sum(p for _, p in played)
         result.accepted.append({
