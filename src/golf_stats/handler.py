@@ -17,3 +17,10 @@ def store_rounds(payload, table):
         logger.warning("Discarded round %s: %s", d["id"], d["reason"])
 
     return {"stored": len(result.accepted), "discarded": len(result.discarded)}
+
+
+def get_location(event):
+    s3_info = event["Records"][0]["s3"]
+    bucket = s3_info["bucket"]["name"]
+    key = s3_info["object"]["key"]
+    return bucket, key

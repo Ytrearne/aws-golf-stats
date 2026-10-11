@@ -1,4 +1,4 @@
-from golf_stats.handler import store_rounds
+from golf_stats.handler import get_location, store_rounds
 from test_parser import make_round
 
 
@@ -22,3 +22,13 @@ def test_store_rounds_writes_accepted_rounds_with_round_id():
     assert [item["round_id"] for item in table.items] == [1]
     assert "id" not in table.items[0]
     assert summary == {"stored": 1, "discarded": 1}
+
+
+def test_get_location_reads_bucket_and_key_from_s3_event():
+    event = {
+        "Records": [
+            {"s3": {"bucket": {"name": "my-bucket"}, "object": {"key": "uploads/garmin.json"}}}
+        ]
+    }
+
+    assert get_location(event) == ("my-bucket", "uploads/garmin.json")
