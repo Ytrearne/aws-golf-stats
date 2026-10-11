@@ -110,3 +110,17 @@ def test_duplicate_id_in_one_payload_is_stored_once():
     result = parse_summary(payload)
 
     assert [r["id"] for r in result.accepted] == [5]
+
+
+def test_unplayed_holes_without_strokes_field_are_handled():
+    rnd = make_round(id=8, played=9, round_type="FRONT_9")
+    for hole in rnd["holes"][9:]:
+        del hole["strokes"]
+    payload = {"totalRows": 1, "scorecardSummaries": [rnd]}
+
+    result = parse_summary(payload)
+
+    assert result.discarded == []
+    rec = result.accepted[0]
+    assert rec["holes_played"] == 9
+    assert rec["hole_strokes"][9:] == [None] * 9

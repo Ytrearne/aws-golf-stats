@@ -25,7 +25,7 @@ def parse_summary(payload):
         if rnd["roundType"] not in EXPECTED_HOLES:
             result.discarded.append({"id": rnd["id"], "reason": "unknown_round_type"})
             continue
-        strokes = [h["strokes"] for h in rnd["holes"]]
+        strokes = [h.get("strokes") for h in rnd["holes"]]
         pars = [int(p) for p in rnd["holePars"]]
         played = [(s, p) for s, p in zip(strokes, pars) if s is not None]
         if len(played) != EXPECTED_HOLES[rnd["roundType"]]:
