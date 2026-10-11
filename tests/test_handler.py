@@ -32,3 +32,14 @@ def test_get_location_reads_bucket_and_key_from_s3_event():
     }
 
     assert get_location(event) == ("my-bucket", "uploads/garmin.json")
+
+
+
+def test_get_location_decodes_special_characters_in_key():
+    event = {
+        "Records": [
+            {"s3": {"bucket": {"name": "b"}, "object": {"key": "uploads/my+garmin%C3%A5.json"}}}
+        ]
+    }
+
+    assert get_location(event) == ("b", "uploads/my garminå.json")

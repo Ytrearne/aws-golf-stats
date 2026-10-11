@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import unquote_plus
 
 from golf_stats.parser import parse_summary
 
@@ -22,5 +23,5 @@ def store_rounds(payload, table):
 def get_location(event):
     s3_info = event["Records"][0]["s3"]
     bucket = s3_info["bucket"]["name"]
-    key = s3_info["object"]["key"]
+    key = unquote_plus(s3_info["object"]["key"])
     return bucket, key
