@@ -8,6 +8,8 @@ def make_round(id=1, played=18, round_type="ALL"):
     """Bygger én falsk Garmin-runde: 5 slag på de første `played` hullene."""
     return {
         "id": id,
+        "customerId": 111,
+        "playerProfileId": 999888777,
         "scoreType": "STROKE_PLAY",
         "courseName": "Testbanen GK",
         "startTime": "2026-06-01T10:00:00.0",
@@ -89,3 +91,22 @@ def test_round_without_id_is_discarded():
 
     assert result.accepted == []
     assert result.discarded == [{"id": None, "reason": "missing_id"}]
+
+
+def test_record_has_exactly_the_fields_we_store():
+    payload = {"totalRows": 1, "scorecardSummaries": [make_round()]}
+
+    rec = parse_summary(payload).accepted[0]
+
+    assert set(rec) == {
+        "id", "course_name", "start_time", "end_time", "round_type",
+        "holes_played", "total_strokes", "score_to_par",
+        "hole_strokes", "hole_pars",
+    }
+
+def test_duplicate_id_in_one_payload_is_stored_once():
+    payload = {"totalRows": 2, "scorecardSummaries": [make_round(id=5), make_round(id=5)]}
+
+    result = parse_summary(payload)
+
+    assert [r["id"] for r in result.accepted] == [5]

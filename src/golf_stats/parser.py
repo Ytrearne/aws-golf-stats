@@ -11,10 +11,14 @@ class ParseResult:
 
 def parse_summary(payload):
     result = ParseResult()
+    seen_ids = set()
     for rnd in payload["scorecardSummaries"]:
         if rnd.get("id") is None:
             result.discarded.append({"id": None, "reason": "missing_id"})
             continue
+        if rnd["id"] in seen_ids:
+            continue
+        seen_ids.add(rnd["id"])
         if rnd["roundInProgress"]:
             result.discarded.append({"id": rnd["id"], "reason": "round_in_progress"})
             continue
@@ -31,9 +35,15 @@ def parse_summary(payload):
         total_par = sum(p for _, p in played)
         result.accepted.append({
             "id": rnd["id"],
+            "course_name": rnd["courseName"],
+            "start_time": rnd["startTime"],
+            "end_time": rnd["endTime"],
+            "round_type": rnd["roundType"],
             "holes_played": len(played),
             "total_strokes": total_strokes,
             "score_to_par": total_strokes - total_par,
+            "hole_strokes": strokes,
+            "hole_pars": pars,
         })
     return result
 
