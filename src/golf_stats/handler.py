@@ -1,9 +1,11 @@
+import json
+import os
 import logging
 from urllib.parse import unquote_plus
-
 from golf_stats.parser import parse_summary
 
 logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def store_rounds(payload, table):
@@ -25,3 +27,19 @@ def get_location(event):
     bucket = s3_info["bucket"]["name"]
     key = unquote_plus(s3_info["object"]["key"])
     return bucket, key
+
+
+def lambda_handler(event, context):
+    import boto3  # importeres her, så testene våre ikke trenger boto3
+
+    bucket, key = get_location(event)
+
+    s3 = boto3.client("s3")
+    body = s3.get_object(Bucket=bucket, Key=key)["Body"].read()
+    payload = json.loads(body)
+
+    table = boto3.resource("dynamodb").Table(os.environ["TABLE_NAME"])
+    summary = store_rounds(payload, table)
+
+    logger.info("Processed s3://%s/%s: %s", bucket, key, summary)
+    return summary
