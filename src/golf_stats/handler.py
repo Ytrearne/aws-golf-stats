@@ -30,7 +30,7 @@ def get_location(event):
 
 
 def lambda_handler(event, context):
-    import boto3  # importeres her, så testene våre ikke trenger boto3
+    import boto3  
 
     bucket, key = get_location(event)
 
