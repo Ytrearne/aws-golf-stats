@@ -50,3 +50,33 @@ resource "aws_iam_role_policy" "lambda_ingest" {
     ]
   })
 }
+
+data "archive_file" "lambda_ingest" {
+  type        = "zip"
+  source_dir  = "${path.module}/src"
+  output_path = "${path.module}/build/lambda_ingest.zip"
+  excludes    = ["**/__pycache__/**"]
+}
+
+resource "aws_lambda_function" "ingest" {
+  function_name    = "golf-stats-round-ingest"
+  role             = aws_iam_role.lambda_ingest.arn
+  runtime          = "python3.13"
+  architectures    = ["arm64"]
+  handler          = "golf_stats.handler.lambda_handler"
+  filename         = data.archive_file.lambda_ingest.output_path
+  source_code_hash = data.archive_file.lambda_ingest.output_base64sha256
+  timeout          = 30
+  memory_size      = 128
+
+  environment {
+    variables = {
+      TABLE_NAME = aws_dynamodb_table.rounds.name
+    }
+  }
+
+  depends_on = [
+    aws_cloudwatch_log_group.lambda_ingest,
+    aws_iam_role_policy.lambda_ingest,
+  ]
+}
