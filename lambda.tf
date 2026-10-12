@@ -80,3 +80,24 @@ resource "aws_lambda_function" "ingest" {
     aws_iam_role_policy.lambda_ingest,
   ]
 }
+
+resource "aws_lambda_permission" "allow_s3" {
+  statement_id   = "AllowExecutionFromS3"
+  action         = "lambda:InvokeFunction"
+  function_name  = aws_lambda_function.ingest.function_name
+  principal      = "s3.amazonaws.com"
+  source_arn     = aws_s3_bucket.csv_uploads.arn
+  source_account = data.aws_caller_identity.current.account_id
+}
+
+resource "aws_s3_bucket_notification" "csv_uploads" {
+  bucket = aws_s3_bucket.csv_uploads.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.ingest.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".json"
+  }
+
+  depends_on = [aws_lambda_permission.allow_s3]
+}
