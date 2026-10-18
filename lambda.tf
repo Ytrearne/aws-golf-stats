@@ -67,7 +67,7 @@ resource "aws_lambda_function" "ingest" {
   filename         = data.archive_file.lambda_ingest.output_path
   source_code_hash = data.archive_file.lambda_ingest.output_base64sha256
   timeout          = 30
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
