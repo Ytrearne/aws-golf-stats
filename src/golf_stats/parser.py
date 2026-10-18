@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-EXPECTED_HOLES = {"ALL": 18, "FRONT_9": 9, "BACK_9": 9}
+EXPECTED_HOLES = {"ALL": 17, "FRONT_9": 9, "BACK_9": 9}
 
 
 @dataclass
