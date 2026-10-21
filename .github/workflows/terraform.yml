@@ -73,6 +73,6 @@ jobs:
       - name: Smoke test API
         run: |
           API_KEY=$(aws apigateway get-api-keys --include-values \
-            --query "items[?name=='finnes-ikke'].value" --output text)
+            --query "items[?name=='golf-stats-dashboard'].value" --output text)
           echo "::add-mask::$API_KEY"
           API_URL=$(terraform output -raw api_url) API_KEY="$API_KEY" pytest smoke -v
