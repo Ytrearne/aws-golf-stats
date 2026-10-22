@@ -1,13 +1,17 @@
 from dashboard_stats import summarize
 from flask import Flask, render_template_string
 
+# Jinja escapes every {{ value }} automatically, so a course name like
+# "<script>" is shown as text instead of running as code.
+# Never add "| safe" to values that come from the API.
 PAGE = """
 <!doctype html>
 <html lang="no">
 <head><meta charset="utf-8"><title>Golf-statistikk</title></head>
 <body>
-  <h1>Mine runder</h1>
+  <h1>Mine golfrunder</h1>
   <p>Runder: {{ stats.rounds }} ({{ stats.full_rounds }} med 18 hull)</p>
+  {# Compare with none, not truthiness: a round exactly at par has score 0. #}
   <p>Beste 18-hullsrunde: {% if stats.best_full_round is not none %}{{ '%+d'|format(stats.best_full_round) }}{% else %}ingen{% endif %}</p>
   <p>Snitt 18-hullsrunde: {% if stats.average_full_round is not none %}{{ '%+.1f'|format(stats.average_full_round) }}{% else %}ingen{% endif %}</p>
   <table>
@@ -28,11 +32,22 @@ PAGE = """
 
 
 def create_app(fetch_rounds):
+    """Build the Flask app.
+
+    fetch_rounds is passed in instead of imported, so tests can give the app
+    fake rounds without calling the real API.
+    """
     app = Flask(__name__)
 
     @app.get("/")
     def front_page():
         rounds = fetch_rounds()
         return render_template_string(PAGE, rounds=rounds, stats=summarize(rounds))
+
+    @app.get("/health")
+    def health():
+        # Called by the load balancer. It must not call the API, otherwise an
+        # API outage would make the load balancer restart a healthy container.
+        return "ok"
 
     return app

@@ -31,3 +31,11 @@ def test_front_page_shows_summary():
     html = client.get("/").get_data(as_text=True)
     assert "Runder: 2" in html
     assert "Beste 18-hullsrunde: +14" in html
+
+
+def test_health_endpoint_does_not_call_the_api():
+    def fail_fetch():
+        raise AssertionError("health check must not fetch rounds")
+
+    response = create_app(fail_fetch).test_client().get("/health")
+    assert response.status_code == 200
