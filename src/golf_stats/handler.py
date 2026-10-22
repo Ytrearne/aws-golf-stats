@@ -1,3 +1,4 @@
+"""Lambda that reads a Garmin export from S3 and stores the rounds in DynamoDB."""
 import json
 import os
 import logging
@@ -9,11 +10,17 @@ logger.setLevel(logging.INFO)
 
 
 def store_rounds(payload, table):
+    """Parse a Garmin export and save every accepted round in the table.
+
+    put_item replaces the whole item, so uploading the same export again
+    updates rounds instead of duplicating them. Returns how many rounds were
+    stored and how many were discarded.
+    """
     result = parse_summary(payload)
 
     for rec in result.accepted:
         item = dict(rec)
-        item["round_id"] = item.pop("id")
+        item["round_id"] = item.pop("id")  # round_id is the table's partition key
         table.put_item(Item=item)
 
     for d in result.discarded:
@@ -23,6 +30,10 @@ def store_rounds(payload, table):
 
 
 def get_location(event):
+    """Return (bucket, key) of the uploaded file from an S3 event.
+
+    S3 URL-encodes the key (a space becomes "+"), so it has to be decoded.
+    """
     s3_info = event["Records"][0]["s3"]
     bucket = s3_info["bucket"]["name"]
     key = unquote_plus(s3_info["object"]["key"])
@@ -30,7 +41,9 @@ def get_location(event):
 
 
 def lambda_handler(event, context):
-    import boto3  
+    """Entry point: runs when a .json file is uploaded to the S3 bucket."""
+    # boto3 is imported here so the unit tests can run without it installed.
+    import boto3
 
     bucket, key = get_location(event)
 
