@@ -34,3 +34,24 @@ resource "aws_s3_bucket_public_access_block" "csv_uploads" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_notification" "csv_uploads" {
+  bucket = aws_s3_bucket.csv_uploads.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.ingest.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".json"
+  }
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.golfbox_ingest.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".txt"
+  }
+
+  depends_on = [
+    aws_lambda_permission.allow_s3,
+    aws_lambda_permission.allow_s3_golfbox,
+  ]
+}
