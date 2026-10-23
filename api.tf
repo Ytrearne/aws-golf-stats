@@ -46,6 +46,9 @@ resource "aws_api_gateway_deployment" "golf" {
       aws_api_gateway_resource.rounds.id,
       aws_api_gateway_method.get_rounds.id,
       aws_api_gateway_integration.get_rounds.id,
+      aws_api_gateway_resource.handicap.id,
+      aws_api_gateway_method.get_handicap.id,
+      aws_api_gateway_integration.get_handicap.id,
     ]))
   }
 
