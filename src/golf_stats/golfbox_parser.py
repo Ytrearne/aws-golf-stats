@@ -1,4 +1,5 @@
 from golf_stats.parser import ParseResult
+from collections import Counter
 
 
 def parse_scorearkiv(text):
@@ -22,4 +23,8 @@ def parse_scorearkiv(text):
             result.discarded.append({"reason": "unreadable_value", "line": line})
             continue
         result.accepted.append(record)
+    per_date = Counter()
+    for record in reversed(result.accepted):
+        per_date[record["date"]] += 1
+        record["round_key"] = f"{record['date']}#{per_date[record['date']]}"
     return result
