@@ -66,3 +66,7 @@ resource "aws_api_gateway_stage" "v1" {
 output "api_url" {
   value = "${aws_api_gateway_stage.v1.invoke_url}/rounds"
 }
+
+output "handicap_url" {
+  value = "${aws_api_gateway_stage.v1.invoke_url}/handicap"
+}
