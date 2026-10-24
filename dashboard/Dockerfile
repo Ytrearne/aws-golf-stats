@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py dashboard_stats.py wsgi.py ./
+COPY app.py charts.py dashboard_stats.py wsgi.py ./
 
 RUN useradd --create-home appuser
 USER appuser

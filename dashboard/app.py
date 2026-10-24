@@ -39,6 +39,8 @@ PAGE = """
   th { color: var(--text-muted); font-weight: 600; }
   .hcp-chart { width: 100%; height: auto; }
   .hcp-line { stroke: var(--series); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .hcp-grid { stroke: var(--grid); stroke-width: 1; }
+  .hcp-label { fill: var(--text-muted); font-size: 11px; }
   .hcp-dot { fill: transparent; stroke: transparent; stroke-width: 2; }
   .hcp-dot:hover, .hcp-chart circle:last-of-type { fill: var(--series); stroke: var(--surface); }
   .hcp-chart circle:last-of-type { r: 4; }
