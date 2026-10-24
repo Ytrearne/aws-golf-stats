@@ -16,7 +16,7 @@ def parse_scorearkiv(text):
                 "date": f"{year}-{month}-{day}",
                 "course_text": course,
                 "handicap_before": float(hcp.replace(",", ".")),
-                "gross": int(gross),
+                "gross": int(gross) if gross.strip() else None,
                 "adjusted_gross": int(adjusted),
             }
         except ValueError:

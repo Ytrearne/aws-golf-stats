@@ -36,3 +36,13 @@ def test_same_day_rounds_get_distinct_keys_counted_from_the_bottom():
     result = parse_scorearkiv(top + "\n" + bottom)
     keys = [r["round_key"] for r in result.accepted]
     assert keys == ["2026-10-07#2", "2026-10-07#1"]
+
+
+def test_keeps_round_with_missing_gross():
+    line = "15.06.2026 00:00\tTestby GK\t12,3\t\t84"
+
+    result = parse_scorearkiv(line)
+
+    assert result.discarded == []
+    assert result.accepted[0]["gross"] is None
+    assert result.accepted[0]["adjusted_gross"] == 84
