@@ -10,7 +10,7 @@ jobs:
   gitleaks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Scan git history for secrets
@@ -22,7 +22,7 @@ jobs:
   checkov:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Scan Terraform and Dockerfile for misconfigurations
         run: |
           docker run --rm -v "$PWD:/tf" \
