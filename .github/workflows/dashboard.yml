@@ -1,0 +1,27 @@
+name: dashboard
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t golf-dashboard dashboard
+      - name: Start container and wait for /health
+        run: |
+          docker run -d --name golf-dash -p 8080:8080 golf-dashboard
+          for i in $(seq 1 15); do
+            if curl -fsS http://localhost:8080/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs golf-dash
+          exit 1
