@@ -18,3 +18,13 @@ jobs:
           docker run --rm -v "$PWD:/path" \
             zricethezav/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
             git -v /path
+
+  checkov:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan Terraform and Dockerfile for misconfigurations
+        run: |
+          docker run --rm -v "$PWD:/tf" \
+            bridgecrew/checkov@sha256:4b65e89f1fde292249fc0aa0d0db43302c036dfe39f7370b2d3517571082b894 \
+            --config-file /tf/.checkov.yaml -d /tf --compact --quiet

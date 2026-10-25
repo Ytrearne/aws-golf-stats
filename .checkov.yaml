@@ -1,0 +1,24 @@
+skip-check:
+  # Accepted risks: deliberate choices, see the reason on each line.
+  - CKV_AWS_117  # Lambda in VPC: no private resources, would only add cost and complexity
+  - CKV_AWS_272  # Code signing: overkill for a personal project
+  - CKV_AWS_173  # Env var encryption: variables only hold table names, no secrets
+  - CKV_AWS_116  # DLQ: API-invoked Lambdas are synchronous, revisit for the ingest ones
+  - CKV_AWS_119  # DynamoDB CMK: default AWS-owned key encryption is enough
+  - CKV_AWS_158  # Log group KMS: default encryption is enough, avoids key policy work
+  - CKV2_AWS_53  # Request validation: API only has GET without a body
+  - CKV_AWS_18   # S3 access logging: small, recreatable data
+  - CKV_AWS_144  # S3 cross-region replication: not needed for recreatable data
+  - CKV2_AWS_61  # S3 lifecycle: tiny data volume
+  - CKV_AWS_120  # API Gateway caching: paid add-on
+  - CKV2_AWS_51  # API Gateway client certificates: not needed
+  - CKV2_AWS_29  # WAF: paid add-on
+  - CKV_AWS_338  # 1 year log retention: can be raised later
+
+  # Backlog: worth fixing, remove from this list as each one is done.
+  - CKV_AWS_50   # X-Ray tracing on Lambda
+  - CKV_AWS_73   # X-Ray tracing on API Gateway stage
+  - CKV_AWS_76   # API Gateway access logging
+  - CKV2_AWS_4   # API Gateway stage logging level
+  - CKV_AWS_115  # Lambda concurrency limit (check account quota first)
+  - CKV_AWS_237  # create_before_destroy on the REST API
