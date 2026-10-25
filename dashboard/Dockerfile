@@ -13,3 +13,5 @@ USER appuser
 EXPOSE 8080
 
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "wsgi:app"]
+
+HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"
