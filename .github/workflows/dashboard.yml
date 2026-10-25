@@ -1,5 +1,4 @@
 name: dashboard
-
 on:
   push:
   pull_request:
@@ -14,6 +13,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build image
         run: docker build -t golf-dashboard dashboard
+      - name: Scan image with Trivy
+        run: |
+          docker save golf-dashboard -o /tmp/golf-dashboard.tar
+          docker run --rm -v /tmp/golf-dashboard.tar:/image.tar \
+            aquasec/trivy@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c \
+            image --quiet --input /image.tar --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1
       - name: Start container and wait for /health
         run: |
           docker run -d --name golf-dash -p 8080:8080 golf-dashboard
