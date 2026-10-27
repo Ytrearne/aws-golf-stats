@@ -17,25 +17,25 @@ Nesten alt i AWS er definert i Terraform (noen få bootstrap-ting er listet leng
 
 ```mermaid
 flowchart LR
-    G[Garmin export .json] --> S3[(S3 bucket<br/>SSE-KMS, versioning)]
-    B[GolfBox export .txt] --> S3
-    S3 -- ".json" --> L1[Lambda: Garmin ingest]
-    S3 -- ".txt" --> L2[Lambda: GolfBox ingest]
-    L1 --> D1[(DynamoDB: rounds)]
-    L2 --> D2[(DynamoDB: golfbox)]
-    D1 --> R1[Lambda: read rounds]
-    D2 --> R2[Lambda: read handicap]
-    R1 --> API[API Gateway<br/>API key required]
+    G["&nbsp;Garmin&nbsp;<br/>&nbsp;.json&nbsp;"] --> S3[("&nbsp;S3 bucket&nbsp;<br/>&nbsp;KMS, versioning&nbsp;")]
+    B["&nbsp;GolfBox&nbsp;<br/>&nbsp;.txt&nbsp;"] --> S3
+    S3 -- ".json" --> L1["&nbsp;Lambda&nbsp;<br/>&nbsp;Garmin ingest&nbsp;"]
+    S3 -- ".txt" --> L2["&nbsp;Lambda&nbsp;<br/>&nbsp;GolfBox ingest&nbsp;"]
+    L1 --> D1[("&nbsp;DynamoDB&nbsp;<br/>&nbsp;rounds&nbsp;")]
+    L2 --> D2[("&nbsp;DynamoDB&nbsp;<br/>&nbsp;golfbox&nbsp;")]
+    D1 --> R1["&nbsp;Lambda&nbsp;<br/>&nbsp;read rounds&nbsp;"]
+    D2 --> R2["&nbsp;Lambda&nbsp;<br/>&nbsp;read handicap&nbsp;"]
+    R1 --> API["&nbsp;API Gateway&nbsp;<br/>&nbsp;API key required&nbsp;"]
     R2 --> API
-    API --> DASH[Flask dashboard<br/>Docker container]
-    L1 -. errors .-> CW[CloudWatch alarm] --> SNS[SNS e-mail]
+    API --> DASH["&nbsp;Flask dashboard&nbsp;<br/>&nbsp;Docker container&nbsp;"]
+    L1 -. errors .-> CW["&nbsp;CloudWatch&nbsp;<br/>&nbsp;alarm&nbsp;"] --> SNS["&nbsp;SNS&nbsp;<br/>&nbsp;e-mail&nbsp;"]
 ```
 
 ## Designvalg
 
 - **DynamoDB i stedet for RDS.** Ingen VPC, ingen passord å rotere, nesten ingen kostnad, og en upsert på en nøkkel (skriver man en post med samme nøkkel igjen, erstatter den den gamle) gjør at samme fil kan lastes opp flere ganger uten duplikater. En Lambda i en VPC som må nå Secrets Manager ville trengt NAT gateway eller betalte endpoints, og det står ikke i forhold til noen hundre rader.
 - **Én Lambda og én IAM-rolle per datakilde og retning (least privilege).** Ingest-rollene kan bare skrive til sin egen tabell, og read-rollene kan bare lese sin egen. En feil i én funksjon kan ikke røre den andre tabellen.
-- **Stabile nøkler uten ID fra kilden.** Radene fra GolfBox har ingen ID, så nøkkelen er datoen pluss et fortløpende nummer for rundene den dagen, talt fra den eldste (for eksempel `2026-06-15#1` for dagens første runde). Nye runder havner øverst i listen og endrer ikke eksisterende nøkler.
+- **Stabile nøkler uten ID fra kilden.** Radene fra GolfBox har ingen ID, så nøkkelen er datoen pluss et løpenummer per dato, talt fra den eldste raden (for eksempel `2026-06-15#1`). Nye runder havner øverst i listen og endrer ikke eksisterende nøkler.
 - **Data minimization.** Garmin profil-ID og kunde-ID lagres aldri i databasen.
 - **Ingen scraping.** GolfBox-dataene kopieres manuelt fra min egen konto. Ingen innloggingsdetaljer til golftjenester lagres i AWS eller i pipelinen.
 - **Kostnad.** Kostnaden når ingenting skjer er omtrent $1–2 i måneden (ca. $0,03–0,06 per dag i Cost Explorer etter at jeg ryddet bort gamle eksperimenter). Kontoen går på AWS Free Plan, som utløper på en fast dato, så infrastrukturen er laget for å kunne bygges opp igjen fra dette repoet.
