@@ -33,7 +33,7 @@ flowchart LR
 
 ## Designvalg
 
-- **DynamoDB i stedet for RDS.** Ingen VPC, ingen passord å rotere, nesten ingen kostnad, og en upsert på en nøkkel (skriver man en post med samme nøkkel igjen, erstatter den den gamle) gjør at samme fil kan lastes opp flere ganger uten duplikater. En Lambda i en VPC som må nå Secrets Manager ville trengt NAT gateway eller betalte endpoints, og det står ikke i forhold til noen hundre rader.
+- **DynamoDB i stedet for RDS.** Ingen VPC, ingen passord å rotere, nesten ingen kostnad, og når en post skrives med en nøkkel som allerede finnes, erstatter den den gamle. Da kan samme fil lastes opp flere ganger uten duplikater. En Lambda i en VPC som må nå Secrets Manager ville trengt NAT gateway eller betalte endpoints, og det står ikke i forhold til noen hundre rader.
 - **Én Lambda og én IAM-rolle per datakilde og retning (least privilege).** Ingest-rollene kan bare skrive til sin egen tabell, og read-rollene kan bare lese sin egen. En feil i én funksjon kan ikke røre den andre tabellen.
 - **Stabile nøkler uten ID fra kilden.** Radene fra GolfBox har ingen ID, så nøkkelen er datoen pluss et løpenummer per dato, talt fra den eldste raden (for eksempel `2026-06-15#1`). Nye runder havner øverst i listen og endrer ikke eksisterende nøkler.
 - **Data minimization.** Garmin profil-ID og kunde-ID lagres aldri i databasen.
