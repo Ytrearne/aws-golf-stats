@@ -102,8 +102,8 @@ Noen få ting ble laget manuelt i AWS-konsollet og ligger ikke i Terraform. De e
 
 ## Om hvordan dette ble bygget
 
-Jeg bygde dette prosjektet for å lære AWS og for å bruke det jeg har lært gjennom studiet i praksis.
+Jeg bygde dette prosjektet for å lære AWS, forstå hvordan tjenestene henger sammen og bruke det jeg har lært gjennom studiet i praksis.
 
-Koden er i stor grad skrevet av Claude, som jeg brukte som tutor og pair programmer. Min del var å sette meg inn i hva koden gjør, kjøre den, feilsøke når noe feilet og ta valgene om hvordan ting skulle settes opp. Vi jobbet i små steg, med testene skrevet før koden.
+Koden er i stor grad skrevet av Claude. Min del var å ta valgene om arkitektur og oppsett, kjøre og feilsøke, og sette meg inn i hva koden gjør.
 
 Personlige datafiler (eksporter fra Garmin og GolfBox) ligger ikke i repoet.
